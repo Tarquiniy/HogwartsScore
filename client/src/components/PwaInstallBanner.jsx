@@ -14,11 +14,33 @@ function isIos() {
 }
 
 const DISMISS_KEY = 'hogwarts_pwa_install_dismissed';
+const IOS_NOTICE_KEY = 'hogwarts_ios_install_notice_shown';
 
-export default function PwaInstallBanner() {
+export default function PwaInstallBanner({ onInstalled }) {
   const [deferred, setDeferred] = useState(null);
   const [showIosHint, setShowIosHint] = useState(false);
   const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (isStandalone()) {
+      if (!isIos()) return undefined;
+      // iOS confirms installation by launching the home-screen app.
+      try {
+        if (localStorage.getItem(IOS_NOTICE_KEY) === '1') return undefined;
+        localStorage.setItem(IOS_NOTICE_KEY, '1');
+      } catch { /* storage unavailable */ }
+      onInstalled();
+      return undefined;
+    }
+
+    const onAppInstalled = () => {
+      setDeferred(null);
+      setVisible(false);
+      onInstalled();
+    };
+    window.addEventListener('appinstalled', onAppInstalled);
+    return () => window.removeEventListener('appinstalled', onAppInstalled);
+  }, [onInstalled]);
 
   useEffect(() => {
     if (isStandalone()) return undefined;

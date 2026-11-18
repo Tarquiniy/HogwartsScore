@@ -58,9 +58,6 @@ export const HOUSE_META = {
 export const USER_KEY = 'hogwarts_user_key';
 export const USER_FIO = 'hogwarts_user_fio';
 
-/** Login name of the only account that may pre-register other users. */
-export const ADMIN_KEY = 'Король Чертей';
-
 /** Sand and the score counter move together over this time, easing out. */
 export const FILL_DURATION_MS = 900;
 

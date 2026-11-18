@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HOUSES, ADMIN_KEY } from '../constants';
+import { HOUSES } from '../constants';
 import HouseCard from './HouseCard';
 import ScoreModal from './ScoreModal';
 import LogPanel from './LogPanel';
@@ -13,6 +13,7 @@ import '../styles/dashboard.css';
 export default function Dashboard({
   userKey,
   userFio,
+  isAdmin,
   scores,
   log,
   onScoresUpdate,
@@ -22,7 +23,6 @@ export default function Dashboard({
   const [selectedHouse, setSelectedHouse] = useState(null);
   const [showLog, setShowLog] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
-  const isAdmin = userKey === ADMIN_KEY;
 
   const maxScore = Math.max(...HOUSES.map((h) => scores[h] || 0));
   // A draw means nobody leads: picking the single top house keeps the crown from

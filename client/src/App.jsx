@@ -11,6 +11,7 @@ import './styles/App.css';
 export default function App() {
   const [userKey, setUserKey] = useState(() => localStorage.getItem(USER_KEY));
   const [userFio, setUserFio] = useState(() => localStorage.getItem(USER_FIO));
+  const [isAdmin, setIsAdmin] = useState(false);
   const [scores, setScores] = useState({});
   const [log, setLog] = useState([]);
   const [toast, setToast] = useState(null);
@@ -21,6 +22,7 @@ export default function App() {
     localStorage.removeItem(USER_FIO);
     setUserKey(null);
     setUserFio(null);
+    setIsAdmin(false);
   }, []);
 
   const loadData = useCallback(async () => {
@@ -46,6 +48,7 @@ export default function App() {
         localStorage.setItem(USER_FIO, session.fio);
         setUserKey(session.userKey);
         setUserFio(session.fio);
+        setIsAdmin(session.isAdmin);
       } catch {
         if (!cancelled) clearSession();
       } finally {
@@ -84,13 +87,21 @@ export default function App() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  const handleWelcome = (key, fio) => {
+  const handleWelcome = (key, fio, admin) => {
     localStorage.setItem(USER_KEY, key);
     localStorage.setItem(USER_FIO, fio);
     setUserKey(key);
     setUserFio(fio);
+    setIsAdmin(admin);
     setAuthChecking(false);
   };
+
+  const showInstallConfirmation = useCallback(() => {
+    setToast({
+      type: 'success',
+      message: 'Приложение установлено, найдите «Кубок домов» на главном экране',
+    });
+  }, []);
 
   const handleLogout = () => {
     clearSession();
@@ -113,6 +124,7 @@ export default function App() {
           <Dashboard
             userKey={userKey}
             userFio={userFio}
+            isAdmin={isAdmin}
             scores={scores}
             log={log}
             onScoresUpdate={setScores}
@@ -122,20 +134,22 @@ export default function App() {
         )}
       </div>
 
-      <PwaInstallBanner />
+      <PwaInstallBanner onInstalled={showInstallConfirmation} />
 
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            className={`toast toast--${toast.type}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-          >
-            {toast.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div role="status">
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              className={`toast toast--${toast.type}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+            >
+              {toast.message}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -50,22 +50,21 @@ function lanAddresses() {
   return out;
 }
 
+try {
+  await ensureAdminUser();
+} catch (err) {
+  console.error('   Не удалось проверить учётные записи администраторов:', err.message);
+}
+
 const server = app.listen(PORT, HOST);
 
-server.on('listening', async () => {
-  try {
-    await ensureAdminUser();
-  } catch (err) {
-    console.error('   Не удалось проверить учётную запись администратора:', err.message);
-  }
-
+server.on('listening', () => {
   console.log(`🏰 Hogwarts Score server: http://localhost:${PORT}`);
   for (const ip of lanAddresses()) {
     console.log(`   Телефон в той же Wi‑Fi: http://${ip}:${PORT}`);
   }
   console.log('   PWA: откройте адрес на телефоне → «Установить» / «На экран Домой»');
   console.log('   API: scores · history · live events · whitelist login');
-  console.log('   Админ для регистрации пользователей: «Король Чертей»');
 });
 
 // A restart in watch mode can outrun the old process releasing the port, and

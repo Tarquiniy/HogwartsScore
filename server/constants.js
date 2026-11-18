@@ -41,5 +41,10 @@ export const HOUSE_GENITIVE = {
   Рейвенкло: 'Рейвенкло',
 };
 
-/** Login name of the only account that may pre-register other users. */
 export const ADMIN_KEY = 'Король Чертей';
+export const ADDITIONAL_ADMIN = { userKey: 'admin', fio: 'admin' };
+
+export function isAdminUser(userKey, fio) {
+  return userKey === ADMIN_KEY ||
+    (userKey === ADDITIONAL_ADMIN.userKey && fio === ADDITIONAL_ADMIN.fio);
+}

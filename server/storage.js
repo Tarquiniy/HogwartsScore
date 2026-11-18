@@ -1,7 +1,9 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { HOUSES, HOUSE_DATIVE, HOUSE_GENITIVE, ADMIN_KEY } from './constants.js';
+import {
+  HOUSES, HOUSE_DATIVE, HOUSE_GENITIVE, ADMIN_KEY, ADDITIONAL_ADMIN, isAdminUser,
+} from './constants.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, 'data');
@@ -73,10 +75,18 @@ function normalizeField(value) {
 
 export async function ensureAdminUser() {
   return withLock(async () => {
+    await fs.mkdir(DATA_DIR, { recursive: true });
     const users = await getUsers();
-    if (!users[ADMIN_KEY]) {
-      users[ADMIN_KEY] = 'Администратор';
+    const primaryAdminFio = users[ADMIN_KEY] || 'Администратор';
+    const { userKey, fio } = ADDITIONAL_ADMIN;
+    const needsAdditionalAdmin = !Object.hasOwn(users, userKey);
+    if (users[ADMIN_KEY] !== primaryAdminFio || needsAdditionalAdmin) {
+      users[ADMIN_KEY] = primaryAdminFio;
+      if (needsAdditionalAdmin) users[userKey] = fio;
       await writeJson(FILES.users, users);
+    }
+    if (users[userKey] !== fio) {
+      console.warn(`Имя «${userKey}» уже занято. Дополнительный администратор не добавлен.`);
     }
     return users;
   });
@@ -98,22 +108,12 @@ export async function loginUser(userKey, fio) {
   return {
     userKey: key,
     fio: normalizeField(stored),
-    isAdmin: key === ADMIN_KEY,
+    isAdmin: isAdminUser(key, stored),
   };
 }
 
 export async function listUsers() {
-  const users = await getUsers();
-  return Object.entries(users)
-    .map(([userKey, fio]) => ({
-      userKey,
-      fio,
-      isAdmin: userKey === ADMIN_KEY,
-    }))
-    .sort((a, b) => {
-      if (a.isAdmin !== b.isAdmin) return a.isAdmin ? -1 : 1;
-      return a.userKey.localeCompare(b.userKey, 'ru');
-    });
+  return listUsersFrom(await getUsers());
 }
 
 export async function createUser(userKey, fio) {
@@ -122,8 +122,8 @@ export async function createUser(userKey, fio) {
   if (!key || !title) {
     throw new Error('Укажите имя и должность с ФИО');
   }
-  if (key === ADMIN_KEY) {
-    throw new Error('Нельзя создать ещё одного администратора с этим именем');
+  if (key === ADMIN_KEY || key === ADDITIONAL_ADMIN.userKey) {
+    throw new Error('Это имя зарезервировано для администратора');
   }
 
   return withLock(async () => {
@@ -140,12 +140,11 @@ export async function createUser(userKey, fio) {
 export async function removeUser(userKey) {
   const key = normalizeField(userKey);
   if (!key) throw new Error('Укажите имя пользователя');
-  if (key === ADMIN_KEY) {
-    throw new Error('Нельзя удалить администратора');
-  }
-
   return withLock(async () => {
     const users = await getUsers();
+    if (isAdminUser(key, users[key])) {
+      throw new Error('Нельзя удалить администратора');
+    }
     if (!users[key]) {
       throw new Error('Пользователь не найден');
     }
@@ -160,7 +159,7 @@ function listUsersFrom(users) {
     .map(([userKey, fio]) => ({
       userKey,
       fio,
-      isAdmin: userKey === ADMIN_KEY,
+      isAdmin: isAdminUser(userKey, fio),
     }))
     .sort((a, b) => {
       if (a.isAdmin !== b.isAdmin) return a.isAdmin ? -1 : 1;

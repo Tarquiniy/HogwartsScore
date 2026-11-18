@@ -14,7 +14,7 @@ import {
   removeUser,
   ensureAdminUser,
 } from '../storage.js';
-import { HOUSES, ADMIN_KEY } from '../constants.js';
+import { HOUSES, isAdminUser } from '../constants.js';
 import { addEventClient, broadcastScores, sendScores } from '../events.js';
 
 const router = Router();
@@ -35,7 +35,7 @@ function adminCredentials(req) {
 async function requireAdmin(req) {
   const { userKey, fio } = adminCredentials(req);
   const session = await loginUser(userKey, fio);
-  if (!session.isAdmin || session.userKey !== ADMIN_KEY) {
+  if (!session.isAdmin) {
     const err = new Error('Только администратор может управлять пользователями');
     err.status = 403;
     throw err;
@@ -94,7 +94,7 @@ router.get('/users/:userKey', async (req, res) => {
     res.json({
       userKey: req.params.userKey,
       fio,
-      isAdmin: req.params.userKey === ADMIN_KEY,
+      isAdmin: isAdminUser(req.params.userKey, fio),
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
