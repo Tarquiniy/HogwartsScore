@@ -1,0 +1,169 @@
+/* A dark glass panel. The house colour appears only as light: a tint at the top
+   of the panel, a glow behind the flask and a hairline along the upper edge. */
+.house-card {
+  position: relative;
+  padding: clamp(1rem, 3.4vw, 1.6rem) clamp(0.8rem, 3vw, 1.4rem) clamp(0.9rem, 3vw, 1.3rem);
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--house-tint) 32%, rgba(255, 255, 255, 0.12));
+  /* The house colour runs the whole height of the panel, deepening downwards. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--house-tint) 40%, #1c1d2c) 0%,
+    color-mix(in srgb, var(--house-tint) 24%, #1a1b29) 55%,
+    color-mix(in srgb, var(--house-tint) 14%, #171826) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 24px 44px -26px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  cursor: pointer;
+  /* Transform belongs to Framer (entry, hover, tap); CSS only fades the rest. */
+  transition: border-color 0.6s ease, box-shadow 0.6s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.house-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 18%;
+  right: 18%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--house-tint) 80%, #ffffff) 50%,
+    transparent
+  );
+  opacity: 0.85;
+}
+
+.house-card__light,
+.house-card__bloom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.house-card__light {
+  background: radial-gradient(
+    ellipse 62% 40% at 50% 34%,
+    color-mix(in srgb, var(--house-tint) 52%, transparent) 0%,
+    transparent 74%
+  );
+}
+
+.house-card__bloom {
+  background: radial-gradient(
+    ellipse 78% 50% at 50% 34%,
+    color-mix(in srgb, var(--house-tint) 78%, #ffffff 0%) 0%,
+    transparent 76%
+  );
+  will-change: opacity;
+}
+
+.house-card__bloom--minus {
+  background: radial-gradient(ellipse 78% 50% at 50% 34%, rgba(0, 0, 0, 0.62) 0%, transparent 76%);
+}
+
+@media (hover: hover) {
+  .house-card:hover {
+    border-color: color-mix(in srgb, var(--house-tint) 45%, rgba(255, 255, 255, 0.3));
+  }
+}
+
+/* The leader is marked by gold only: a hairline, a faint halo, the number. */
+.house-card--leader,
+.house-card--leader:hover {
+  border-color: rgba(220, 190, 120, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 50px -14px rgba(220, 190, 120, 0.6),
+    0 24px 44px -26px rgba(0, 0, 0, 0.7);
+}
+
+.house-card__content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.house-card__name {
+  font-family: var(--font-display);
+  font-size: clamp(0.86rem, 3vw, 1.02rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: rgba(244, 239, 228, 0.92);
+  margin-bottom: 0.3rem;
+}
+
+.house-card__score-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.house-card__score {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-size: clamp(2.5rem, 9.5vw, 3.7rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text-light);
+  transition: color 0.6s ease;
+}
+
+.house-card--leader .house-card__score {
+  color: #dcc38a;
+}
+
+.house-card__label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: lowercase;
+  color: rgba(236, 230, 216, 0.62);
+}
+
+/* "+N" rising quietly above the flask. */
+.house-card__delta {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 20;
+  translate: -50% 0;
+  pointer-events: none;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-variant-numeric: lining-nums;
+  font-weight: 600;
+  font-size: clamp(1.25rem, 4.6vw, 1.7rem);
+  line-height: 1;
+  color: var(--text-light);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.95);
+  white-space: nowrap;
+}
+
+.house-card__delta--minus {
+  color: #d8a59b;
+}
+
+.house-card__leader-slot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 1.7rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 380px) {
+  .house-card {
+    padding: 0.85rem 0.55rem 0.8rem;
+    border-radius: 15px;
+  }
+
+  .house-card__score {
+    font-size: 2.35rem;
+  }
+}

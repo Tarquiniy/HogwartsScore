@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Кубок домов">
+  <rect width="100" height="100" rx="22" fill="#0a0a12"/>
+  <path d="M18 22h32v32H18z" fill="#740001"/>
+  <path d="M50 22h32v32H50z" fill="#1A472A"/>
+  <path d="M18 54h32v32H18z" fill="#ECB939"/>
+  <path d="M50 54h32v32H50z" fill="#0E1A40"/>
+  <rect x="18" y="22" width="64" height="64" rx="6" fill="none" stroke="#d4af37" stroke-width="3"/>
+  <path fill="#d4af37" d="M42 48h16l2 18H40l2-18zm-4 20h24v5H38zm8-28h8c6 4 10 10 10 16h-28c0-6 4-12 10-16z"/>
+</svg>

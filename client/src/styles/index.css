@@ -1,0 +1,99 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-deep: #12131f;
+  --bg-card: rgba(27, 28, 42, 0.95);
+  --text-gold: #c9a961;
+  --text-light: #ece6d8;
+  --text-muted: #a8a294;
+  --glass-border: rgba(255, 255, 255, 0.13);
+  --shadow-glow: 0 40px 80px -40px rgba(0, 0, 0, 0.9);
+  /* Cinzel has no Cyrillic, so every Russian heading fell back to a system serif. */
+  --font-display: 'Cormorant SC', 'Cormorant Garamond', Georgia, serif;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  /* Cormorant's default old-style figures make "10" read as "ιο" and "0" as "ф". */
+  font-variant-numeric: lining-nums;
+  background: var(--bg-deep);
+  color: var(--text-light);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+button {
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+input,
+textarea,
+select {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-variant-numeric: lining-nums;
+  outline: none;
+  font-size: 16px; /* iOS: smaller fonts trigger zoom on focus */
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-gold);
+  border-radius: 3px;
+}
+
+/* Titles: still, soft gold. Nothing on the page moves unless a score changes. */
+.dashboard__title,
+.welcome__title {
+  background: linear-gradient(180deg, #ecdcb4 0%, #c9a961 58%, #a58440 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-weight: 500;
+}
+
+.ornament {
+  display: block;
+  max-width: 40%;
+  height: auto;
+  margin: 0.8rem auto 0.9rem;
+}

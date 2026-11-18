@@ -1,0 +1,122 @@
+.flask {
+  --flask-w: min(100%, clamp(110px, 32vw, 200px));
+  position: relative;
+  width: var(--flask-w);
+  margin: 0 auto;
+}
+
+/* The bottle stands on something: a soft contact shadow at its foot. */
+.flask::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 1.5%;
+  width: 62%;
+  height: 5%;
+  translate: -50% 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse closest-side, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+}
+
+.magic-flask__stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 800 / 1120;
+  line-height: 0;
+}
+
+.magic-flask__canvas,
+.magic-flask__coat,
+.magic-flask__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Sand sits behind the glass; the photographed bottle composites over it. */
+.magic-flask__canvas {
+  z-index: 1;
+}
+
+.magic-flask__img {
+  z-index: 2;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.5));
+}
+
+/* Sand showing through glass that is too opaque to see it otherwise. */
+.magic-flask__coat {
+  z-index: 2;
+}
+
+/* The Hufflepuff jar covers more than twice the area of the bottles, so at the
+   same height it looked like the house had more points. Shrink it from the base. */
+.flask--hufflepuff .magic-flask__stage {
+  transform: scale(0.8);
+  transform-origin: 50% 92%;
+}
+
+.magic-flask__shine {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  mix-blend-mode: screen;
+}
+
+.magic-flask__shine::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: 0;
+  width: 42%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.34) 50%, transparent 100%);
+  transform: translateX(-140%) skewX(-12deg);
+}
+
+.magic-flask__shine--run::before {
+  animation: flask-shine 1.5s ease-out 0.15s 1 both;
+}
+
+@keyframes flask-shine {
+  from { transform: translateX(-140%) skewX(-12deg); }
+  to { transform: translateX(380%) skewX(-12deg); }
+}
+
+.house-card__visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(170px, 46vw, 270px);
+  padding: 0.5rem 0.25rem;
+  margin-bottom: 0.6rem;
+  overflow: visible;
+  background: none;
+}
+
+@media (min-width: 1024px) {
+  .flask {
+    --flask-w: clamp(130px, 100%, 176px);
+  }
+
+  .house-card__visual {
+    min-height: 250px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magic-flask__shine {
+    display: none;
+  }
+}

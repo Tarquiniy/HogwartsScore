@@ -1,0 +1,108 @@
+.welcome {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(1.25rem, env(safe-area-inset-top)) 1.25rem max(1.25rem, env(safe-area-inset-bottom));
+}
+
+.welcome__card {
+  width: 100%;
+  max-width: 520px;
+  padding: clamp(1.5rem, 5vw, 3rem) clamp(1.15rem, 4vw, 2.5rem);
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-glow);
+  text-align: center;
+}
+
+.welcome__crest {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0.15rem;
+  margin-bottom: 1rem;
+}
+
+.welcome__flask {
+  height: clamp(72px, 20vw, 96px);
+  width: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+}
+
+/* Same correction as on the board: the wide jar would outweigh the bottles. */
+.welcome__flask--hufflepuff {
+  height: clamp(58px, 16vw, 77px);
+}
+
+.welcome__title {
+  font-size: 1.8rem;
+  color: var(--text-gold);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.welcome__subtitle {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+
+.welcome__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.welcome__input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-size: 1.15rem;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(201, 169, 97, 0.2);
+  border-radius: 10px;
+  color: var(--text-light);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.welcome__input:focus {
+  border-color: var(--text-gold);
+  box-shadow: 0 0 20px rgba(201, 169, 97, 0.15);
+}
+
+.welcome__input::placeholder {
+  color: var(--text-muted);
+}
+
+.welcome__btn {
+  margin-top: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bg-deep);
+  background: linear-gradient(180deg, #d8bf85 0%, #c0a05a 100%);
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.welcome__btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(201, 169, 97, 0.35);
+}
+
+.welcome__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.welcome__error {
+  color: #ff8080;
+  font-size: 0.95rem;
+}
