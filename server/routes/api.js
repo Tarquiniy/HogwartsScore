@@ -58,6 +58,7 @@ router.get('/scores', async (_req, res) => {
 
 router.get('/events', async (req, res) => {
   res.set({
+    'X-Accel-Buffering': 'no',
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
     Connection: 'keep-alive',
