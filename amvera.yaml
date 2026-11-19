@@ -5,7 +5,7 @@ meta:
     version: 22
 
 build:
-  additionalCommands: npm ci --prefix client && npm run build --prefix client && npm ci --prefix server
+  additionalCommands: npm ci --prefix client && npm run build --prefix client && npm ci --prefix server && npm cache clean --force
 
 run:
   command: node server/index.js
