@@ -38,14 +38,32 @@ export default function Dashboard({
   };
 
   const handleReset = async () => {
+    if (!isAdmin) return;
     if (!window.confirm('Обнулить баллы всех факультетов? История начислений сохранится.')) return;
-    const newScores = await api.resetScores(userKey, userFio);
-    onScoresUpdate(newScores);
+    try {
+      const newScores = await api.resetScores(userKey, userFio);
+      onScoresUpdate(newScores);
+    } catch (err) {
+      window.alert(err.message || 'Не удалось обнулить баллы');
+    }
   };
 
+  // Throws on failure so LogPanel can show its own message.
   const handleClearLog = async () => {
+    if (!isAdmin) return;
     const newLog = await api.clearLog(userKey, userFio);
     onLogUpdate(newLog);
+  };
+
+  const handleMenuClearLog = async () => {
+    if (!window.confirm('Очистить всю историю начислений? Это действие нельзя отменить.')) {
+      return;
+    }
+    try {
+      await handleClearLog();
+    } catch (err) {
+      window.alert(err.message || 'Не удалось очистить историю');
+    }
   };
 
   const openLog = async () => {
@@ -87,12 +105,7 @@ export default function Dashboard({
             isAdmin={isAdmin}
             onManageUsers={() => setShowUsers(true)}
             onResetScores={handleReset}
-            onClearLog={async () => {
-              if (!window.confirm('Очистить всю историю начислений? Это действие нельзя отменить.')) {
-                return;
-              }
-              await handleClearLog();
-            }}
+            onClearLog={handleMenuClearLog}
             onLogout={onLogout}
           />
         </div>
@@ -136,7 +149,7 @@ export default function Dashboard({
       </AnimatePresence>
 
       <AnimatePresence>
-        {showUsers && (
+        {isAdmin && showUsers && (
           <UsersAdminPanel
             adminKey={userKey}
             adminFio={userFio}
