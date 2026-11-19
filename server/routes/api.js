@@ -36,7 +36,7 @@ async function requireAdmin(req) {
   const { userKey, fio } = adminCredentials(req);
   const session = await loginUser(userKey, fio);
   if (!session.isAdmin) {
-    const err = new Error('Только администратор может управлять пользователями');
+    const err = new Error('Это действие доступно только администратору');
     err.status = 403;
     throw err;
   }
