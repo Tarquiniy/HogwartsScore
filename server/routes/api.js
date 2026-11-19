@@ -34,8 +34,13 @@ function adminCredentials(req) {
 
 async function requireAdmin(req) {
   const { userKey, fio } = adminCredentials(req);
-  const session = await loginUser(userKey, fio);
-  if (!session.isAdmin) {
+  let session;
+  try {
+    session = await loginUser(userKey, fio);
+  } catch {
+    session = null;
+  }
+  if (!session?.isAdmin) {
     const err = new Error('Это действие доступно только администратору');
     err.status = 403;
     throw err;
