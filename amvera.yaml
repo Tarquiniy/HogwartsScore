@@ -1,0 +1,13 @@
+meta:
+  environment: node
+  toolchain:
+    name: npm
+    version: 22
+
+build:
+  additionalCommands: npm ci --prefix client && npm run build --prefix client && npm ci --prefix server
+
+run:
+  command: node server/index.js
+  containerPort: 3001
+  persistenceMount: /data
