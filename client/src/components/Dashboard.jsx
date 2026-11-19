@@ -39,12 +39,12 @@ export default function Dashboard({
 
   const handleReset = async () => {
     if (!window.confirm('Обнулить баллы всех факультетов? История начислений сохранится.')) return;
-    const newScores = await api.resetScores();
+    const newScores = await api.resetScores(userKey, userFio);
     onScoresUpdate(newScores);
   };
 
   const handleClearLog = async () => {
-    const newLog = await api.clearLog();
+    const newLog = await api.clearLog(userKey, userFio);
     onLogUpdate(newLog);
   };
 
@@ -128,6 +128,7 @@ export default function Dashboard({
         {showLog && (
           <LogPanel
             log={log}
+            isAdmin={isAdmin}
             onClose={() => setShowLog(false)}
             onClearLog={handleClearLog}
           />
