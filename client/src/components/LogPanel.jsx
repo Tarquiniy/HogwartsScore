@@ -1,162 +1,127 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { HOUSES } from '../constants';
-import HouseCard from './HouseCard';
-import ScoreModal from './ScoreModal';
-import LogPanel from './LogPanel';
-import DashboardMenu from './DashboardMenu';
-import UsersAdminPanel from './UsersAdminPanel';
+import { motion } from 'framer-motion';
 import { api } from '../api';
-import { Ornament, ScrollIcon } from './Icons';
-import '../styles/dashboard.css';
+import { ScrollIcon, CloseIcon } from './Icons';
+import '../styles/log-panel.css';
 
-export default function Dashboard({
-  userKey,
-  userFio,
-  isAdmin,
-  scores,
-  log,
-  onScoresUpdate,
-  onLogUpdate,
-  onLogout,
-}) {
-  const [selectedHouse, setSelectedHouse] = useState(null);
-  const [showLog, setShowLog] = useState(false);
-  const [showUsers, setShowUsers] = useState(false);
+function formatTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
-  const maxScore = Math.max(...HOUSES.map((h) => scores[h] || 0));
-  // A draw means nobody leads: picking the single top house keeps the crown from
-  // defaulting to whichever faculty comes first in the list.
-  const topHouses = HOUSES.filter((h) => (scores[h] || 0) === maxScore);
-  const leaderHouse = maxScore > 0 && topHouses.length === 1 ? topHouses[0] : null;
-
-  const handleSuccess = async (result) => {
-    setSelectedHouse(null);
-    onScoresUpdate(result.scores);
-    const newLog = await api.getLog();
-    onLogUpdate(newLog);
-  };
-
-  const handleReset = async () => {
-    if (!isAdmin) return;
-    if (!window.confirm('Обнулить баллы всех факультетов? История начислений сохранится.')) return;
-    try {
-      const newScores = await api.resetScores(userKey, userFio);
-      onScoresUpdate(newScores);
-    } catch (err) {
-      window.alert(err.message || 'Не удалось обнулить баллы');
+function splitLogMessage(entry) {
+  const storedComment = entry.comment?.trim();
+  if (storedComment) {
+    const suffix = ` — ${storedComment}`;
+    if (entry.message.endsWith(suffix)) {
+      return {
+        message: entry.message.slice(0, -suffix.length),
+        comment: storedComment,
+      };
     }
-  };
+    return { message: entry.message, comment: storedComment };
+  }
 
-  // Throws on failure so LogPanel can show its own message.
-  const handleClearLog = async () => {
+  const dashIndex = entry.message.lastIndexOf(' — ');
+  if (dashIndex > 0) {
+    const extracted = entry.message.slice(dashIndex + 3).trim();
+    if (extracted.length >= 2) {
+      return {
+        message: entry.message.slice(0, dashIndex),
+        comment: extracted,
+      };
+    }
+  }
+
+  return { message: entry.message, comment: null };
+}
+
+export default function LogPanel({ log, onClose, onClearLog, isAdmin = false }) {
+  const handleClear = async () => {
     if (!isAdmin) return;
-    const newLog = await api.clearLog(userKey, userFio);
-    onLogUpdate(newLog);
-  };
-
-  const handleMenuClearLog = async () => {
     if (!window.confirm('Очистить всю историю начислений? Это действие нельзя отменить.')) {
       return;
     }
     try {
-      await handleClearLog();
+      await onClearLog();
     } catch (err) {
       window.alert(err.message || 'Не удалось очистить историю');
     }
   };
 
-  const openLog = async () => {
-    const newLog = await api.getLog();
-    onLogUpdate(newLog);
-    setShowLog(true);
-  };
-
   return (
-    <div className="dashboard">
-      {/* On phones this whole block becomes one sticky row: title left, icons right. */}
-      <div className="dashboard__top">
-        <motion.header
-          className="dashboard__header"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="dashboard__title">Кубок домов Хогвартс</h1>
-          <Ornament className="dashboard__ornament" />
-          <p className="dashboard__greeting">
-            Приветствую, {userFio}
-            {isAdmin ? ' · администратор' : ''}
-          </p>
-        </motion.header>
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 550,
+          background: 'rgba(0,0,0,0.4)',
+        }}
+        onClick={onClose}
+      />
+      <motion.div
+        className="log-panel"
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+      >
+        <div className="log-panel__header">
+          <h2 className="log-panel__title"><ScrollIcon /> История баллов</h2>
+          <button className="log-panel__close" onClick={onClose} aria-label="Закрыть"><CloseIcon /></button>
+        </div>
 
-        <div className="dashboard__toolbar">
+        <div className="log-panel__list">
+          {log.length === 0 ? (
+            <p className="log-panel__empty">История пока пуста</p>
+          ) : (
+            log.map((entry) => {
+              const { message, comment } = splitLogMessage(entry);
+              return (
+                <div key={entry.id} className={`log-entry log-entry--${entry.action}`}>
+                  <p className="log-entry__message">{message}</p>
+                  {comment && (
+                    <p className="log-entry__comment">
+                      <span className="log-entry__comment-label">Причина:</span> {comment}
+                    </p>
+                  )}
+                  <p className="log-entry__time">{formatTime(entry.timestamp)}</p>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        <div className="log-panel__footer">
           <button
             type="button"
-            className="dashboard__btn dashboard__btn--history"
-            onClick={openLog}
-            aria-label="История"
-            title="История"
+            className="log-panel__download"
+            onClick={() => api.downloadLog()}
+            disabled={log.length === 0}
           >
-            <ScrollIcon />
-            <span className="dashboard__btn-label">История</span>
+            Скачать history.txt
           </button>
-          <DashboardMenu
-            userFio={userFio}
-            isAdmin={isAdmin}
-            onManageUsers={() => setShowUsers(true)}
-            onResetScores={handleReset}
-            onClearLog={handleMenuClearLog}
-            onLogout={onLogout}
-          />
+          {isAdmin && (
+            <button
+              type="button"
+              className="log-panel__clear"
+              onClick={handleClear}
+              disabled={log.length === 0}
+            >
+              Очистить историю
+            </button>
+          )}
         </div>
-      </div>
-
-      <div className="houses-grid">
-        {HOUSES.map((house, i) => (
-          <HouseCard
-            key={house}
-            house={house}
-            score={scores[house] || 0}
-            known={Object.prototype.hasOwnProperty.call(scores, house)}
-            maxScore={maxScore}
-            isLeader={house === leaderHouse}
-            onClick={setSelectedHouse}
-            index={i}
-          />
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {selectedHouse && (
-          <ScoreModal
-            house={selectedHouse}
-            userFio={userFio}
-            onClose={() => setSelectedHouse(null)}
-            onSuccess={handleSuccess}
-          />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showLog && (
-          <LogPanel
-            log={log}
-            isAdmin={isAdmin}
-            onClose={() => setShowLog(false)}
-            onClearLog={handleClearLog}
-          />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isAdmin && showUsers && (
-          <UsersAdminPanel
-            adminKey={userKey}
-            adminFio={userFio}
-            onClose={() => setShowUsers(false)}
-          />
-        )}
-      </AnimatePresence>
-    </div>
+      </motion.div>
+    </>
   );
 }
