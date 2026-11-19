@@ -74,36 +74,40 @@ export default function DashboardMenu({
                 {isAdmin && <span className="dashboard-menu__who-role">администратор</span>}
               </div>
             )}
+
             {isAdmin && (
-              <button
-                type="button"
-                className="dashboard-menu__item"
-                role="menuitem"
-                onClick={() => runAction(onManageUsers)}
-              >
-                <span className="dashboard-menu__icon"><UsersIcon /></span>
-                Пользователи
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="dashboard-menu__item"
+                  role="menuitem"
+                  onClick={() => runAction(onManageUsers)}
+                >
+                  <span className="dashboard-menu__icon"><UsersIcon /></span>
+                  Пользователи
+                </button>
+                <button
+                  type="button"
+                  className="dashboard-menu__item dashboard-menu__item--danger"
+                  role="menuitem"
+                  onClick={() => runAction(onResetScores)}
+                >
+                  <span className="dashboard-menu__icon"><ResetIcon /></span>
+                  Обнулить баллы
+                </button>
+                <button
+                  type="button"
+                  className="dashboard-menu__item dashboard-menu__item--danger"
+                  role="menuitem"
+                  onClick={() => runAction(onClearLog)}
+                >
+                  <span className="dashboard-menu__icon"><TrashIcon /></span>
+                  Очистить историю
+                </button>
+                <div className="dashboard-menu__divider" />
+              </>
             )}
-            <button
-              type="button"
-              className="dashboard-menu__item dashboard-menu__item--danger"
-              role="menuitem"
-              onClick={() => runAction(onResetScores)}
-            >
-              <span className="dashboard-menu__icon"><ResetIcon /></span>
-              Обнулить баллы
-            </button>
-            <button
-              type="button"
-              className="dashboard-menu__item dashboard-menu__item--danger"
-              role="menuitem"
-              onClick={() => runAction(onClearLog)}
-            >
-              <span className="dashboard-menu__icon"><TrashIcon /></span>
-              Очистить историю
-            </button>
-            <div className="dashboard-menu__divider" />
+
             <button
               type="button"
               className="dashboard-menu__item"
