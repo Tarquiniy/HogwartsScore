@@ -182,22 +182,24 @@ router.get('/log/download', async (_req, res) => {
   }
 });
 
-router.post('/log/clear', async (_req, res) => {
+router.post('/log/clear', async (req, res) => {
   try {
+    await requireAdmin(req);
     const log = await clearLog();
     res.json(log);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
-router.post('/scores/reset', async (_req, res) => {
+router.post('/scores/reset', async (req, res) => {
   try {
+    await requireAdmin(req);
     const scores = await resetScores();
     broadcastScores(scores);
     res.json(scores);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
