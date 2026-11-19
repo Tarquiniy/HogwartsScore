@@ -97,6 +97,20 @@ export const api = {
   },
   getLog: () => request('/log'),
   downloadLog: () => window.open(`${BASE}/log/download`, '_blank'),
-  clearLog: () => request('/log/clear', { method: 'POST' }),
-  resetScores: () => request('/scores/reset', { method: 'POST' }),
+  clearLog: (adminKey, adminFio) =>
+  request('/log/clear', {
+    method: 'POST',
+    headers: {
+      'X-User-Key': encodeURIComponent(adminKey),
+      'X-User-Fio': encodeURIComponent(adminFio),
+    },
+  }),
+  resetScores: (adminKey, adminFio) =>
+  request('/scores/reset', {
+    method: 'POST',
+    headers: {
+      'X-User-Key': encodeURIComponent(adminKey),
+      'X-User-Fio': encodeURIComponent(adminFio),
+    },
+  }),
 };
