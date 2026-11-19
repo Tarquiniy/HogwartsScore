@@ -12,6 +12,13 @@ async function request(url, options = {}) {
   return data;
 }
 
+function adminHeaders(adminKey, adminFio) {
+  return {
+    'X-User-Key': encodeURIComponent(adminKey ?? ''),
+    'X-User-Fio': encodeURIComponent(adminFio ?? ''),
+  };
+}
+
 export const api = {
   getScores: () => request('/scores'),
   login: (userKey, fio) =>
@@ -21,27 +28,18 @@ export const api = {
     }),
   listUsers: (adminKey, adminFio) =>
     request('/admin/users', {
-      headers: {
-        'X-User-Key': encodeURIComponent(adminKey),
-        'X-User-Fio': encodeURIComponent(adminFio),
-      },
+      headers: adminHeaders(adminKey, adminFio),
     }),
   createUser: (adminKey, adminFio, userKey, fio) =>
     request('/admin/users', {
       method: 'POST',
-      headers: {
-        'X-User-Key': encodeURIComponent(adminKey),
-        'X-User-Fio': encodeURIComponent(adminFio),
-      },
+      headers: adminHeaders(adminKey, adminFio),
       body: JSON.stringify({ userKey, fio }),
     }),
   removeUser: (adminKey, adminFio, userKey) =>
     request(`/admin/users/${encodeURIComponent(userKey)}`, {
       method: 'DELETE',
-      headers: {
-        'X-User-Key': encodeURIComponent(adminKey),
-        'X-User-Fio': encodeURIComponent(adminFio),
-      },
+      headers: adminHeaders(adminKey, adminFio),
     }),
   addPoints: (house, amount, userFio, comment = '') =>
     request(`/scores/${encodeURIComponent(house)}/add`, {
@@ -98,19 +96,13 @@ export const api = {
   getLog: () => request('/log'),
   downloadLog: () => window.open(`${BASE}/log/download`, '_blank'),
   clearLog: (adminKey, adminFio) =>
-  request('/log/clear', {
-    method: 'POST',
-    headers: {
-      'X-User-Key': encodeURIComponent(adminKey),
-      'X-User-Fio': encodeURIComponent(adminFio),
-    },
-  }),
+    request('/log/clear', {
+      method: 'POST',
+      headers: adminHeaders(adminKey, adminFio),
+    }),
   resetScores: (adminKey, adminFio) =>
-  request('/scores/reset', {
-    method: 'POST',
-    headers: {
-      'X-User-Key': encodeURIComponent(adminKey),
-      'X-User-Fio': encodeURIComponent(adminFio),
-    },
-  }),
+    request('/scores/reset', {
+      method: 'POST',
+      headers: adminHeaders(adminKey, adminFio),
+    }),
 };
